@@ -1,3 +1,6 @@
+import math
+from math import sqrt
+
 class Point:
 
     def __init__(self, x, y, z):
@@ -34,12 +37,55 @@ class Point:
         return Point(x, y, z)
 
 
+class Vecteur:
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def dot(self, b):
+        return self.x * b.x + self.y * b.y + self.z * b.z
+
+    def cross(self, b):
+        return (
+            self.y *
+            b.z -
+            self.z *
+            b.y,
+            self.z *
+            b.x -
+            self.x *
+            b.z,
+            self.x *
+            b.y -
+            self.y *
+            b.x)
+
+    def magnitude(self):
+        return sqrt(self.x**2 + self.y**2 + self.z**2)
+
+    def normal(self):
+        mag = self.magnitude()
+        return Vecteur(self.x / mag, self.y / mag, self.z / mag)
+
+    def __add__(self, b):
+        return Vecteur(self.x + b.x, self.y + b.y, self.z + b.z)
+
+    def __sub__(self, b):
+        return Vecteur(self.x - b.x, self.y - b.y, self.z - b.z)
+
+    def __mul__(self, b):
+        assert isinstance(b, float) or isinstance(b, int)
+        return Vecteur(self.x * b, self.y * b, self.z * b)
+
+
 class Couleur:
 
     def __init__(self, r, g, b):
         self.r = r
         self.g = g
         self.b = b
+
     def _get_r(self):
         return self._r
 
@@ -61,9 +107,3 @@ class Couleur:
     r = property(_get_r, _set_r)
     g = property(_get_g, _set_g)
     b = property(_get_b, _set_b)
-
-    '''def __add__(self,other):
-        x = self.x+other.x
-        y = self.y+other.y
-        z = self.z+other.z
-        return Point(x,y,z)'''
