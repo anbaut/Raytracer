@@ -3,7 +3,10 @@ from math import sqrt
 
 
 class Point:
-""" Classe qui définit les points de la scène """
+    """
+        Classe qui définit les points du raytracer
+    """
+
     def __init__(self, point_x, point_y, point_z):
         self.point_x = point_x
         self.point_y = point_y
@@ -39,6 +42,10 @@ class Point:
 
 
 class Vecteur:
+    """
+        Classe qui gère les vecteurs du raytracer
+    """
+
     def __init__(self, vecteur_x, vecteur_y, vecteur_z):
         self.vecteur_x = vecteur_x
         self.vecteur_y = vecteur_y
@@ -100,6 +107,9 @@ class Vecteur:
 
 
 class Couleur:
+    """
+        Classe qui gère les couleurs des éléments
+    """
 
     def __init__(self, couleur_r, couleur_g, couleur_b):
         self.couleur_r = couleur_r
