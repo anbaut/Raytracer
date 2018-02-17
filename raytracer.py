@@ -133,37 +133,33 @@ class Vecteur:
             self.vecteur_z * other)
 
 
-class Couleur:
+class Couleur(Vecteur):
     """
         Classe qui gère les couleurs des éléments
     """
 
-    def __init__(self, couleur_r, couleur_g, couleur_b):
-        self._couleur_r = couleur_r
-        self._couleur_g = couleur_g
-        self._couleur_b = couleur_b
+    def __init__(self, vecteur_x, vecteur_y, vecteur_z):
+        self.vecteur_x = int(vecteur_x)
+        self.vecteur_y = int(vecteur_y)
+        self.vecteur_z = int(vecteur_z)
 
-    def _get_couleur_r(self):
-        return self._couleur_r
+    def _set_vecteur_x(self, vecteur_x):
+        if vecteur_x < 0:
+            self.vecteur_x = 0
+        elif vecteur_x > 255:
+            self.vecteur_x = 255
 
-    def _set_couleur_r(self, couleur_r):
-        self._couleur_r = couleur_r
+    def _set_vecteur_y(self, vecteur_y):
+        if vecteur_y < 0:
+            self.vecteur_y = 0
+        elif vecteur_y > 255:
+            self.vecteur_y = 255
 
-    def _get_couleur_g(self):
-        return self._couleur_g
-
-    def _set_couleur_g(self, couleur_g):
-        self._couleur_g = couleur_g
-
-    def _get_couleur_b(self):
-        return self._couleur_b
-
-    def _set_couleur_b(self, couleur_b):
-        self._couleur_b = couleur_b
-
-    couleur_r = property(_get_couleur_r, _set_couleur_r)
-    couleur_g = property(_get_couleur_g, _set_couleur_g)
-    couleur_b = property(_get_couleur_b, _set_couleur_b)
+    def _set_vecteur_z(self, vecteur_z):
+        if vecteur_z < 0:
+            self.vecteur_z = 0
+        elif vecteur_z > 255:
+            self.vecteur_z = 255
 
 
 class Sphere(object):
@@ -290,18 +286,19 @@ def gamme_correction(color, factor):
 AMBIENT = 0.1
 GAMMA_CORRECTION = 1 / 2.2
 
-OBJS = [] 
+OBJS = []
 
-OBJS.append(Sphere(Vecteur(-3.5, 1, -5), 1, Vecteur(120, 255, 0)))
-OBJS.append(Sphere(Vecteur(2, 1, -5), 2, Vecteur(255, 0, 0)))
-OBJS.append(Sphere(Vecteur(-0.5, -4, -5), 1.8, Vecteur(0, 200, 255)))
-OBJS.append(Sphere(Vecteur(-4, -2, -5), 1.8, Vecteur(85, 0, 255)))
-OBJS.append(Sphere(Vecteur(3.8, -3.5, -5), 2.4, Vecteur(120, 120, 120)))
-OBJS.append(Plane(Vecteur(-2, 4, -12), Vecteur(0, 0, 1),
-                  Vecteur(30, 30, 30)))  # normal, point, color
+OBJS.append(Sphere(Vecteur(-3.5, 1, -5), 1, Couleur(120, 255, 0)))
+OBJS.append(Sphere(Vecteur(2, 1, -5), 2, Couleur(340.5, 0, 0)))
+OBJS.append(Sphere(Vecteur(-0.5, -4, -5), 1.8, Couleur(0, 200, 255)))
+OBJS.append(Sphere(Vecteur(-4, -2, -5), 1.8, Couleur(85, 0, 255)))
+OBJS.append(Sphere(Vecteur(3.8, -3.5, -5), 2.4, Couleur(120, 120.1, 120)))
+OBJS.append(Plane(Vecteur(-2, 4, -12), Couleur(0, 0, 1),
+                  Couleur(30, 30, 30)))  # normal, point, color
 
 # experiment with a different (x,y,z) light position
-LIGHTSOURCE = Vecteur(0,10,-3)
+LIGHTSOURCE = Vecteur(0, 10, -3)
+
 
 IMG = Image.new("RGB", (500, 500))
 CAMERAPOS = Vecteur(0, 0, 20)
@@ -317,4 +314,4 @@ for x in range(500):  # loop over all x values for our image
         col = trace(ray, OBJS, LIGHTSOURCE, 10)
         IMG.putpixel((x, 499 - y), gamme_correction(col, GAMMA_CORRECTION))
 # save the image as a .png (or "BMP", but it produces a much larger file)
-IMG.save("trace.png", "PNG")
+IMG.save("raytracer.png", "PNG")
