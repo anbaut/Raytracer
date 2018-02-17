@@ -9,9 +9,9 @@ class Point:
     """
 
     def __init__(self, point_x, point_y, point_z):
-        self.point_x = point_x
-        self.point_y = point_y
-        self.point_z = point_z
+        self._point_x = point_x
+        self._point_y = point_y
+        self._point_z = point_z
 
     def _get_point_x(self):
         return self._point_x
@@ -36,9 +36,9 @@ class Point:
     z = property(_get_point_z, _set_point_z)
 
     def __add__(self, other):
-        point_x = self.point_x + other.point_x
-        point_y = self.point_y + other.point_y
-        point_z = self.point_z + other.point_z
+        point_x = self._point_x + other.point_x
+        point_y = self._point_y + other.point_y
+        point_z = self._point_z + other.point_z
         return Point(point_x, point_y, point_z)
 
 
@@ -113,9 +113,9 @@ class Couleur:
     """
 
     def __init__(self, couleur_r, couleur_g, couleur_b):
-        self.couleur_r = couleur_r
-        self.couleur_g = couleur_g
-        self.couleur_b = couleur_b
+        self._couleur_r = couleur_r
+        self._couleur_g = couleur_g
+        self._couleur_b = couleur_b
 
     def _get_couleur_r(self):
         return self._couleur_r
