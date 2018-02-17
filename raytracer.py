@@ -57,27 +57,29 @@ class Vecteur:
         self.vecteur_y = vecteur_y
         self.vecteur_z = vecteur_z
 
-    def dot(self, b):
-        return self.vecteur_x * b.vecteur_x + self.vecteur_y * \
-            b.vecteur_y + self.vecteur_z * b.vecteur_z
+    def dot(self, other):
+        """
+            Multiplie les 2 vecteurs ensemble
+        """
+        return self.vecteur_x * other.vecteur_x + self.vecteur_y * other.vecteur_y + self.vecteur_z * other.vecteur_z
 
-    def cross(self, b):
+    def cross(self, other):
         """
             Donne le produit vectoriel des deux vecteurs passés en paramètre
         """
         return (
             self.vecteur_y *
-            b.vecteur_z -
+            other.vecteur_z -
             self.vecteur_z *
-            b.vecteur_y,
+            other.vecteur_y,
             self.vecteur_z *
-            b.vecteur_x -
+            other.vecteur_x -
             self.vecteur_x *
-            b.vecteur_z,
+            other.vecteur_z,
             self.vecteur_x *
-            b.vecteur_y -
+            other.vecteur_y -
             self.vecteur_y *
-            b.vecteur_x)
+            other.vecteur_x)
 
     def magnitude(self):
         """
@@ -95,40 +97,39 @@ class Vecteur:
             self.vecteur_y / mag,
             self.vecteur_z / mag)
 
-    def __add__(self, b):
+    def __add__(self, other):
         """
             Redéfinit la fonction "+" pour additionner 2 vecteurs
         """
         return Vecteur(
             self.vecteur_x +
-            b.vecteur_x,
+            other.vecteur_x,
             self.vecteur_y +
-            b.vecteur_y,
+            other.vecteur_y,
             self.vecteur_z +
-            b.vecteur_z)
+            other.vecteur_z)
 
-    def __sub__(self, b):
+    def __sub__(self, other):
         """
             Redéfinit la fonction "-" pour soustraire 2 vecteurs
         """
         return Vecteur(
             self.vecteur_x -
-            b.vecteur_x,
+            other.vecteur_x,
             self.vecteur_y -
-            b.vecteur_y,
+            other.vecteur_y,
             self.vecteur_z -
-            b.vecteur_z)
+            other.vecteur_z)
 
-    def __mul__(self, b):
+    def __mul__(self, other):
         """
             Redéfinit la fonction "*" pour multiplier 2 vecteurs
         """
-        assert isinstance(b, float) or isinstance(b, int)
+        assert isinstance(other, float) or isinstance(other, int)
         return Vecteur(
-            self.vecteur_x * b,
-            self.vecteur_y * b,
-            self.vecteur_z * b)
-
+            self.vecteur_x * other,
+            self.vecteur_y * other,
+            self.vecteur_z * other)
 
 class Couleur:
     """
@@ -162,7 +163,6 @@ class Couleur:
     couleur_g = property(_get_couleur_g, _set_couleur_g)
     couleur_b = property(_get_couleur_b, _set_couleur_b)
 
-
 class Sphere(object):
     """
         Permet la création de Sphère dans la scène
@@ -174,8 +174,7 @@ class Sphere(object):
         self.couleur = couleur
 
     def intersection(self, l):
-        q = l.d.dot(l.o - self.centre)**2 - \
-            (l.o - self.centre).dot(l.o - self.centre) + self.rayon**2
+        q = l.d.dot(l.o - self.centre)**2-(l.o - self.centre).dot(l.o - self.centre) + self.rayon**2
         if q < 0:
             return Intersection(Vecteur(0, 0, 0), -1, Vecteur(0, 0, 0), self)
 
@@ -244,7 +243,7 @@ class Intersection(object):
         self.obj = obj
 
 
-def testRay(ray, objects, ignore=None):
+def test_ray(ray, objects, ignore=None):
     intersect = Intersection(Vecteur(0, 0, 0), -1, Vecteur(0, 0, 0), None)
 
     for obj in objects:
@@ -260,14 +259,14 @@ def testRay(ray, objects, ignore=None):
 def trace(ray, objects, light, max_recur):
     if max_recur < 0:
         return (0, 0, 0)
-    intersect = testRay(ray, objects)
+    intersect = test_ray(ray, objects)
     if intersect.d == -1:
         col = Vecteur(AMBIENT, AMBIENT, AMBIENT)
     elif intersect.n.dot(light - intersect.p) < 0:
         col = intersect.obj.couleur * AMBIENT
     else:
         light_ray = Ray(intersect.p, (light - intersect.p).normal())
-        if testRay(light_ray, objects, intersect.obj).d == -1:
+        if test_ray(light_ray, objects, intersect.obj).d == -1:
             light_intensity = 1000.0 / \
                 (4 * pi * (light - intersect.p).magnitude()**2)
             col = intersect.obj.couleur * \
