@@ -141,18 +141,18 @@ class Couleur:
 
 
 class Sphere(object):
-    def __init__(self, center, radius, color):
-        self.c = center
-        self.r = radius
-        self.col = color
+    def __init__(self, centre, rayon, couleur):
+        self.centre = centre
+        self.rayon = rayon
+        self.couleur = couleur
 
     def intersection(self, l):
-        q = l.d.dot(l.o - self.c)**2 - \
-            (l.o - self.c).dot(l.o - self.c) + self.r**2
+        q = l.d.dot(l.o - self.centre)**2 - \
+            (l.o - self.centre).dot(l.o - self.centre) + self.rayon**2
         if q < 0:
             return Intersection(Vecteur(0, 0, 0), -1, Vecteur(0, 0, 0), self)
         else:
-            d = -l.d.dot(l.o - self.c)
+            d = -l.d.dot(l.o - self.centre)
             d1 = d - sqrt(q)
             d2 = d + sqrt(q)
             if 0 < d1 and (d1 < d2 or d2 < 0):
@@ -174,14 +174,14 @@ class Sphere(object):
                                     Vecteur(0, 0, 0), self)
 
     def normal(self, b):
-        return (b - self.c).normal()
+        return (b - self.centre).normal()
 
 
 class Plane(object):
-    def __init__(self, point, normal, color):
+    def __init__(self, point, normal, couleur):
         self.n = normal
         self.p = point
-        self.col = color
+        self.couleur = couleur
 
     def intersection(self, l):
         d = l.d.dot(self.n)
@@ -226,16 +226,16 @@ def trace(ray, objects, light, maxRecur):
     if intersect.d == -1:
         col = Vecteur(AMBIENT, AMBIENT, AMBIENT)
     elif intersect.n.dot(light - intersect.p) < 0:
-        col = intersect.obj.col * AMBIENT
+        col = intersect.obj.couleur * AMBIENT
     else:
         lightRay = Ray(intersect.p, (light - intersect.p).normal())
         if testRay(lightRay, objects, intersect.obj).d == -1:
             lightIntensity = 1000.0 / \
                 (4 * pi * (light - intersect.p).magnitude()**2)
-            col = intersect.obj.col * \
+            col = intersect.obj.couleur * \
                 max(intersect.n.normal().dot((light - intersect.p).normal() * lightIntensity), AMBIENT)
         else:
-            col = intersect.obj.col * AMBIENT
+            col = intersect.obj.couleur * AMBIENT
     return col
 
 
