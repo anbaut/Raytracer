@@ -61,7 +61,8 @@ class Vecteur:
         """
             Multiplie les 2 vecteurs ensemble
         """
-        return self.vecteur_x * other.vecteur_x + self.vecteur_y * other.vecteur_y + self.vecteur_z * other.vecteur_z
+        return self.vecteur_x * other.vecteur_x + self.vecteur_y * \
+            other.vecteur_y + self.vecteur_z * other.vecteur_z
 
     def cross(self, other):
         """
@@ -131,6 +132,7 @@ class Vecteur:
             self.vecteur_y * other,
             self.vecteur_z * other)
 
+
 class Couleur:
     """
         Classe qui gère les couleurs des éléments
@@ -163,6 +165,7 @@ class Couleur:
     couleur_g = property(_get_couleur_g, _set_couleur_g)
     couleur_b = property(_get_couleur_b, _set_couleur_b)
 
+
 class Sphere(object):
     """
         Permet la création de Sphère dans la scène
@@ -174,7 +177,8 @@ class Sphere(object):
         self.couleur = couleur
 
     def intersection(self, l):
-        q = l.d.dot(l.o - self.centre)**2-(l.o - self.centre).dot(l.o - self.centre) + self.rayon**2
+        q = l.d.dot(l.o - self.centre)**2 - \
+            (l.o - self.centre).dot(l.o - self.centre) + self.rayon**2
         if q < 0:
             return Intersection(Vecteur(0, 0, 0), -1, Vecteur(0, 0, 0), self)
 
@@ -261,7 +265,7 @@ def trace(ray, objects, light, max_recur):
         return (0, 0, 0)
     intersect = test_ray(ray, objects)
     if intersect.d == -1:
-        col = Vecteur(AMBIENT, AMBIENT, AMBIENT)
+        col = Couleur(AMBIENT, AMBIENT, AMBIENT)
     elif intersect.n.dot(light - intersect.p) < 0:
         col = intersect.obj.couleur * AMBIENT
     else:
@@ -286,18 +290,18 @@ def gamme_correction(color, factor):
 AMBIENT = 0.1
 GAMMA_CORRECTION = 1 / 2.2
 
-OBJS = []   # create an empty Python "list"
-# Put 4 objects into the list: 3 spheres and a plane (rf. class __init__
-# methods for parameters)
-# center, radius, color(=RGB)
-OBJS.append(Sphere(Vecteur(-2, 0, -10), 2.0, Vecteur(0, 255, 0)))
-OBJS.append(Sphere(Vecteur(2, 0, -10), 3.5, Vecteur(255, 0, 0)))
-OBJS.append(Sphere(Vecteur(0, -4, -10), 3.0, Vecteur(0, 0, 255)))
-OBJS.append(Plane(Vecteur(0, 0, -12), Vecteur(0, 0, 1),
-                  Vecteur(255, 255, 255)))  # normal, point, color
+OBJS = [] 
+
+OBJS.append(Sphere(Vecteur(-3.5, 1, -5), 1, Vecteur(120, 255, 0)))
+OBJS.append(Sphere(Vecteur(2, 1, -5), 2, Vecteur(255, 0, 0)))
+OBJS.append(Sphere(Vecteur(-0.5, -4, -5), 1.8, Vecteur(0, 200, 255)))
+OBJS.append(Sphere(Vecteur(-4, -2, -5), 1.8, Vecteur(85, 0, 255)))
+OBJS.append(Sphere(Vecteur(3.8, -3.5, -5), 2.4, Vecteur(120, 120, 120)))
+OBJS.append(Plane(Vecteur(-2, 4, -12), Vecteur(0, 0, 1),
+                  Vecteur(30, 30, 30)))  # normal, point, color
 
 # experiment with a different (x,y,z) light position
-LIGHTSOURCE = Vecteur(-10, 0, 0)
+LIGHTSOURCE = Vecteur(0,10,-3)
 
 IMG = Image.new("RGB", (500, 500))
 CAMERAPOS = Vecteur(0, 0, 20)
