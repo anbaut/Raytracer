@@ -242,7 +242,6 @@ class Intersection(object):
         self.n = normal
         self.obj = obj
 
-
 def test_ray(ray, objects, ignore=None):
     intersect = Intersection(Vecteur(0, 0, 0), -1, Vecteur(0, 0, 0), None)
 
@@ -254,7 +253,6 @@ def test_ray(ray, objects, ignore=None):
             elif 0 < current_intersect.d < intersect.d:
                 intersect = current_intersect
     return intersect
-
 
 def trace(ray, objects, light, max_recur):
     if max_recur < 0:
@@ -276,16 +274,13 @@ def trace(ray, objects, light, max_recur):
             col = intersect.obj.couleur * AMBIENT
     return col
 
-
 def gamme_correction(color, factor):
     return (int(pow(color.vecteur_x / 255.0, factor) * 255),
             int(pow(color.vecteur_y / 255.0, factor) * 255),
             int(pow(color.vecteur_z / 255.0, factor) * 255))
 
-
 AMBIENT = 0.1
-GAMMA_CORRECTION = 1 / 2.2
-
+GAMMA_CORRECTION = 1 / 2.2 #Change le niveau de Gamma du rendu
 OBJS = []
 
 OBJS.append(Sphere(Vecteur(-3.5, 1, -5), 1, Couleur(120, 255, 0)))
@@ -298,8 +293,6 @@ OBJS.append(Plane(Vecteur(-2, 4, -12), Couleur(0, 0, 1),
 
 # experiment with a different (x,y,z) light position
 LIGHTSOURCE = Vecteur(0, 10, -3)
-
-
 IMG = Image.new("RGB", (500, 500))
 CAMERAPOS = Vecteur(0, 0, 20)
 for x in range(500):  # loop over all x values for our image
