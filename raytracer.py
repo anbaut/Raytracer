@@ -84,7 +84,7 @@ class Vecteur:
 
     def magnitude(self):
         """
-            Donne la magnitude du vecteur
+            Donne la norme du vecteur
         """
         return sqrt(self.vecteur_x**2 + self.vecteur_y**2 + self.vecteur_z**2)
 
@@ -202,8 +202,8 @@ class Sphere(object):
 
         return Intersection(Vecteur(0, 0, 0), -1, Vecteur(0, 0, 0), self)
 
-    def normal(self, b):
-        return (b - self.centre).normal()
+    def normal(self, other):
+        return (other - self.centre).normal()
 
 
 class Plane(object):
@@ -243,30 +243,36 @@ class Intersection(object):
     """
 
     def __init__(self, point, distance, normal, obj):
-        self.p = point
-        self.d = distance
-        self.n = normal
+        self.point = point
+        self.distance = distance
+        self.normal = normal
         self.obj = obj
 
 
 def test_ray(ray, objects, ignore=None):
+    """
+        Teste si le le point est visible ou non
+    """
     intersect = Intersection(Vecteur(0, 0, 0), -1, Vecteur(0, 0, 0), None)
 
     for obj in objects:
         if obj is not ignore:
             current_intersect = obj.intersection(ray)
-            if current_intersect.d > 0 and intersect.d < 0:
+            if current_intersect.distance > 0 and intersect.distance < 0:
                 intersect = current_intersect
-            elif 0 < current_intersect.d < intersect.d:
+            elif 0 < current_intersect.distance < intersect.distance:
                 intersect = current_intersect
     return intersect
 
 
 def trace(ray, objects, light, max_recur):
+    """
+        Renvoie la couleur du rayon
+    """
     if max_recur < 0:
         return (0, 0, 0)
     intersect = test_ray(ray, objects)
-    if intersect.d == -1:
+    if intersect.distance == -1:
         col = Couleur(AMBIENT, AMBIENT, AMBIENT)
     else:
         col = intersect.obj.couleur * AMBIENT
@@ -274,6 +280,9 @@ def trace(ray, objects, light, max_recur):
 
 
 def gamme_correction(color, factor):
+    """
+        Corrige l'affichage de la couleur avec un correcteur Gamma
+    """
     return (int(pow(color.vecteur_x / 255.0, factor) * 255),
             int(pow(color.vecteur_y / 255.0, factor) * 255),
             int(pow(color.vecteur_z / 255.0, factor) * 255))
