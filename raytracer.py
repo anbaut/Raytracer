@@ -4,7 +4,7 @@
      et de créer une image
      en fonction des éléments crées sur une scène
 """
-from math import sqrt, pi
+from math import sqrt
 from PIL import Image
 
 
@@ -59,7 +59,7 @@ class Vecteur:
 
     def dot(self, other):
         """
-            Multiplie les 2 vecteurs ensemble
+            Produit Scalaire de 2 vecteurs
         """
         return self.vecteur_x * other.vecteur_x + self.vecteur_y * \
             other.vecteur_y + self.vecteur_z * other.vecteur_z
@@ -172,32 +172,35 @@ class Sphere(object):
         self.rayon = rayon
         self.couleur = couleur
 
-    def intersection(self, l):
-        q = l.d.dot(l.o - self.centre)**2 - \
-            (l.o - self.centre).dot(l.o - self.centre) + self.rayon**2
-        if q < 0:
+    def intersection(self, other):
+        """
+            Calcule les intersections
+        """
+        other.origin -= self.centre
+        coef_a = other.dir.dot(other.dir)
+        coef_b = 2 * (other.dir.dot(other.origin))
+        coef_c = other.origin.dot(other.origin) - self.rayon**2
+        discriminant = coef_b**2 - 4 * coef_a * coef_c
+        if(discriminant < 0):
             return Intersection(Vecteur(0, 0, 0), -1, Vecteur(0, 0, 0), self)
-
-        d = -l.d.dot(l.o - self.centre)
-        d1 = d - sqrt(q)
-        d2 = d + sqrt(q)
-        if 0 < d1 and (d1 < d2 or d2 < 0):
+        valeur_a = (-coef_b - sqrt(discriminant)) / (2 * coef_a)
+        valeur_b = (-coef_b + sqrt(discriminant)) / (2 * coef_a)
+        if valeur_a > 0 and (valeur_a < valeur_b or valeur_b < 0):
             return Intersection(
-                l.o + l.d * d1,
-                d1,
+                other.origin + other.dir * valeur_a,
+                valeur_a,
                 self.normal(
-                    l.o + l.d * d1),
+                    other.origin + other.dir * valeur_a),
                 self)
-        if 0 < d2 and (d2 < d1 or d1 < 0):
+        if valeur_b > 0 and (valeur_b < valeur_a or valeur_a < 0):
             return Intersection(
-                l.o + l.d * d2,
-                d2,
+                other.origin + other.dir * valeur_b,
+                valeur_b,
                 self.normal(
-                    l.o + l.d * d2),
+                    other.origin + other.dir * valeur_b),
                 self)
 
-        return Intersection(Vecteur(0, 0, 0), -1,
-                            Vecteur(0, 0, 0), self)
+        return Intersection(Vecteur(0, 0, 0), -1, Vecteur(0, 0, 0), self)
 
     def normal(self, b):
         return (b - self.centre).normal()
@@ -209,16 +212,19 @@ class Plane(object):
     """
 
     def __init__(self, point, normal, couleur):
-        self.n = normal
-        self.p = point
+        self.normal = normal
+        self.point = point
         self.couleur = couleur
 
-    def intersection(self, l):
-        d = l.d.dot(self.n)
-        if d == 0:
+    def intersection(self, other):
+        """
+            Calcule les intersections
+        """
+        valeur = other.dir.dot(self.normal)
+        if valeur == 0:
             return Intersection(Vecteur(0, 0, 0), -1, Vecteur(0, 0, 0), self)
-        d = (self.p - l.o).dot(self.n) / d
-        return Intersection(l.o + l.d * d, d, self.n, self)
+        valeur = (self.point - other.origin).dot(self.normal) / valeur
+        return Intersection(other.origin + other.dir * valeur, valeur, self.normal, self)
 
 
 class Ray(object):
@@ -227,8 +233,8 @@ class Ray(object):
     """
 
     def __init__(self, origin, direction):
-        self.o = origin
-        self.d = direction
+        self.origin = origin
+        self.dir = direction
 
 
 class Intersection(object):
@@ -242,6 +248,7 @@ class Intersection(object):
         self.n = normal
         self.obj = obj
 
+
 def test_ray(ray, objects, ignore=None):
     intersect = Intersection(Vecteur(0, 0, 0), -1, Vecteur(0, 0, 0), None)
 
@@ -254,57 +261,57 @@ def test_ray(ray, objects, ignore=None):
                 intersect = current_intersect
     return intersect
 
+
 def trace(ray, objects, light, max_recur):
     if max_recur < 0:
         return (0, 0, 0)
     intersect = test_ray(ray, objects)
     if intersect.d == -1:
         col = Couleur(AMBIENT, AMBIENT, AMBIENT)
-    elif intersect.n.dot(light - intersect.p) < 0:
-        col = intersect.obj.couleur * AMBIENT
     else:
-        light_ray = Ray(intersect.p, (light - intersect.p).normal())
-        if test_ray(light_ray, objects, intersect.obj).d == -1:
-            light_intensity = 1000.0 / \
-                (4 * pi * (light - intersect.p).magnitude()**2)
-            col = intersect.obj.couleur * \
-                max(intersect.n.normal().dot((light - intersect.p).normal() *
-                                             light_intensity), AMBIENT)
-        else:
-            col = intersect.obj.couleur * AMBIENT
+        col = intersect.obj.couleur * AMBIENT
     return col
+
 
 def gamme_correction(color, factor):
     return (int(pow(color.vecteur_x / 255.0, factor) * 255),
             int(pow(color.vecteur_y / 255.0, factor) * 255),
             int(pow(color.vecteur_z / 255.0, factor) * 255))
 
-AMBIENT = 0.1
-GAMMA_CORRECTION = 1 / 2.2 #Change le niveau de Gamma du rendu
-OBJS = []
 
+AMBIENT = 0.1
+GAMMA_CORRECTION = 1 / 2.2  # Valeur de la correction Gamma
+
+OBJS = []  # Dictionnaire contenant tout les éléments de la scène
+
+# Place des éléments sur la scène
 OBJS.append(Sphere(Vecteur(-3.5, 1, -5), 1, Couleur(120, 255, 0)))
 OBJS.append(Sphere(Vecteur(2, 1, -5), 2, Couleur(340.5, 0, 0)))
 OBJS.append(Sphere(Vecteur(-0.5, -4, -5), 1.8, Couleur(0, 200, 255)))
 OBJS.append(Sphere(Vecteur(-4, -2, -5), 1.8, Couleur(85, 0, 255)))
 OBJS.append(Sphere(Vecteur(3.8, -3.5, -5), 2.4, Couleur(120, 120.1, 120)))
 OBJS.append(Plane(Vecteur(-2, 4, -12), Couleur(0, 0, 1),
-                  Couleur(30, 30, 30)))  # normal, point, color
+                  Couleur(30, 30, 30)))
 
-# experiment with a different (x,y,z) light position
-LIGHTSOURCE = Vecteur(0, 10, -3)
+LIGHTSOURCE = Vecteur(0, 10, -3)  # Emplacement de la lumière
+
+
+# Dimensions de l'image avec son format couleur
 IMG = Image.new("RGB", (500, 500))
-CAMERAPOS = Vecteur(0, 0, 20)
-for x in range(500):  # loop over all x values for our image
-    print(x)   # provide some feedback to the user about our progress
-    for y in range(500):  # loop over all y values
+CAMERAPOS = Vecteur(0, 0, 20)  # Emplacement de la caméra
+for x in range(500):
+    print(x, "/500")  # Donne l'avancement de l'éxécution du programme
+    for y in range(500):
         ray = Ray(
             CAMERAPOS,
             (Vecteur(
                 x / 50.0 - 5,
                 y / 50.0 - 5,
                 0) - CAMERAPOS).normal())
-        col = trace(ray, OBJS, LIGHTSOURCE, 10)
+        # Récupère la couleur transmise par le rayon
+        col = trace(ray, OBJS, LIGHTSOURCE, 0)
+        # Place un pixel de couleur et applique la correction Gamma
         IMG.putpixel((x, 499 - y), gamme_correction(col, GAMMA_CORRECTION))
-# save the image as a .png (or "BMP", but it produces a much larger file)
-IMG.save("raytracer.png", "PNG")
+
+IMG.save("raytracer.png", "PNG")  # Sauvegarde l'image au format PNG
+print("Traitement terminé")
